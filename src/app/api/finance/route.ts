@@ -1,4 +1,6 @@
-import puppeteer from "puppeteer";
+// import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 import { NextRequest, NextResponse } from "next/server";
 import { googleCompanySymbol } from "@/utils/constant";
 import LRU from "lru-cache";
@@ -13,6 +15,17 @@ const cache = new LRU({
   ttl: 1000 * 60 * 3, // 5 minutes in ms (instead of maxAge)
 });
 
+export const dynamic = "force-dynamic";
+
+const viewport = {
+  deviceScaleFactor: 1,
+  hasTouch: false,
+  height: 1080,
+  isLandscape: true,
+  isMobile: false,
+  width: 1920,
+};
+
 export async function GET(request: NextRequest) {
   const cacheKey = "stocks";
 
@@ -21,7 +34,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(cache.get(cacheKey));
   }
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
+    headless: true,
+    defaultViewport: viewport,
+  });
+
   const result: Record<string, FinanceData> = {};
 
   const companyEntries = Object.entries(googleCompanySymbol).flatMap(
