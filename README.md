@@ -1,3 +1,6 @@
+
+https://github.com/user-attachments/assets/00f7b0a2-8b5b-4cf8-8d66-43b091446c11
+
 # 📈 Portfolio Overview
 
 A stock portfolio dashboard built with **Next.js**, providing key financial insights using data scraped from **Google Finance** and fetched from **Yahoo Finance**.
