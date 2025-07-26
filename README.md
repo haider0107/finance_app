@@ -26,7 +26,7 @@ This project showcases:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/portfolio-overview.git
+git clone https://github.com/haider0107/finance_app.git
 cd portfolio-overview
 
 ```
