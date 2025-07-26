@@ -19,36 +19,6 @@ function flattenCompanySymbols(obj: Record<string, Record<string, string>>) {
 
 const allCompanySymbols = flattenCompanySymbols(yahooCompanySymbol);
 
-// export async function GET(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ symbol: string }> }
-// ) {
-//   const { symbol } = await params;
-
-//   try {
-//     const result = await yahooFinance.quoteSummary(symbol, {
-//       modules: ["price", "summaryDetail", "defaultKeyStatistics"],
-//     });
-
-//     const data = {
-//       cmp: result.price?.regularMarketPrice,
-//       currency: result.price?.currency,
-//       peRatio: result.summaryDetail?.trailingPE,
-//       eps: result.defaultKeyStatistics?.trailingEps,
-//     };
-
-//     return new Response(JSON.stringify(data), {
-//       status: 200,
-//       headers: { "Content-Type": "application/json" },
-//     });
-//   } catch (err) {
-//     const error = err as Error;
-//     return new Response(JSON.stringify({ error: error.message }), {
-//       status: 500,
-//     });
-//   }
-// }
-
 export async function GET(req: NextRequest) {
   const data: FinanceResponse = {};
 

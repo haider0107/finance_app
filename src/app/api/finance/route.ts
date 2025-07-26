@@ -1,60 +1,26 @@
 import puppeteer from "puppeteer";
 import { NextRequest, NextResponse } from "next/server";
 import { googleCompanySymbol } from "@/utils/constant";
+import LRU from "lru-cache";
 
 type FinanceData = {
   peRatio?: string;
   eps?: string;
 };
 
-// export async function GET(request: NextRequest) {
-//   const browser = await puppeteer.launch();
-//   const page = await browser.newPage();
-
-//   try {
-//     const result: Record<string, FinanceData> = {};
-
-//     for (const [_, companies] of Object.entries(googleCompanySymbol)) {
-//       for (const [company, symbol] of Object.entries(companies)) {
-//         const url = `https://www.google.com/finance/quote/${symbol}`;
-//         console.log(`Fetching: ${company} -> ${url}`);
-
-//         await page.goto(url, { waitUntil: "networkidle2" });
-//         await page.waitForSelector("div.P6K39c", { timeout: 2000 });
-
-//         const data: FinanceData = await page.evaluate(() => {
-//           const res: FinanceData = {};
-
-//           document.querySelectorAll("div.gyFHrc").forEach((div) => {
-//             const label = div.querySelector("div.mfs7Fc")?.textContent?.trim();
-//             const value = div.querySelector("div.P6K39c")?.textContent?.trim();
-//             if (label === "P/E ratio") res.peRatio = value;
-//           });
-
-//           document.querySelectorAll("tr.roXhBd").forEach((row) => {
-//             const label = row.querySelector("div.rsPbEe")?.textContent?.trim();
-//             const value = row.querySelector("td.QXDnM")?.textContent?.trim();
-//             if (label === "Earnings per share") res.eps = value;
-//           });
-
-//           return res;
-//         });
-
-//         result[company] = data;
-//       }
-//     }
-
-//     return NextResponse.json(result);
-//   } catch (err) {
-//     await browser.close();
-//     const error = err as Error;
-//     return new Response(JSON.stringify({ error: error.message }), {
-//       status: 500,
-//     });
-//   }
-// }
+const cache = new LRU({
+  max: 100, // Maximum number of items (required)
+  ttl: 1000 * 60 * 3, // 5 minutes in ms (instead of maxAge)
+});
 
 export async function GET(request: NextRequest) {
+  const cacheKey = "stocks";
+
+  if (cache.has(cacheKey)) {
+    console.log("Cache hit");
+    return NextResponse.json(cache.get(cacheKey));
+  }
+
   const browser = await puppeteer.launch({ headless: true });
   const result: Record<string, FinanceData> = {};
 
@@ -111,5 +77,7 @@ export async function GET(request: NextRequest) {
   }
 
   await browser.close();
+
+  cache.set(cacheKey, result);
   return NextResponse.json(result);
 }
